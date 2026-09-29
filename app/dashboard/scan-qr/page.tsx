@@ -113,7 +113,6 @@ export default function ScanQRPage() {
             <Scanner 
               onScan={handleScan}
               components={{
-                audio: false, // Matikan suara beep bawaan
                 finder: false // Kita pakai bingkai kustom di atas
               }}
             />

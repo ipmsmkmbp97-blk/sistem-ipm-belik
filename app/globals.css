@@ -1,26 +1,38 @@
+/* File: app/globals.css */
+/* Memanggil mesin Tailwind Versi 4 (menggantikan @tailwind base dll) */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Di Versi 4, pendaftaran warna custom langsung dilakukan di file CSS */
+@theme {
+  --color-ipm-primary: #00199F;
+  --color-ipm-secondary: #007FA7;
+  --color-ipm-white: #FFFFFF;
+  --color-ipm-dark: #111827;
+  --color-ipm-gray: #6B7280;
+  --color-ipm-light: #F8FAFC;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --radius: 0.5rem;
+  }
+  body {
+    /* Menerapkan warna latar belakang dan teks secara global */
+    background-color: var(--color-ipm-light);
+    color: var(--color-ipm-dark);
   }
 }
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* File: app/globals.css */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; 
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3); 
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5); 
 }

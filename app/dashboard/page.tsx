@@ -93,10 +93,10 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Tanggal & Jam disembunyikan di HP untuk menghemat ruang */}
-        <div className="hidden sm:block relative z-10 md:text-right border-l border-white/20 pl-4 mt-4 md:mt-0">
-          <p className="text-sm font-bold tracking-wider">{tanggalFormat}</p>
-          <p className="text-xs text-blue-200 mt-1">{jamFormat} WIB</p>
+        {/* ================= PERBAIKAN: Tanggal & Jam (Sekarang muncul di HP & Laptop) ================= */}
+        <div className="relative z-10 md:text-right flex flex-col items-start sm:items-end mt-3 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 sm:border-l border-white/20 w-full sm:w-auto sm:pl-4">
+          <p className="text-xs sm:text-sm font-bold tracking-wider">{tanggalFormat}</p>
+          <p className="text-[10px] sm:text-xs text-blue-200 mt-0.5 sm:mt-1">{jamFormat} WIB</p>
         </div>
       </div>
 

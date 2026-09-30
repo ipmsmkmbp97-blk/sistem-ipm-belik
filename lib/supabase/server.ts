@@ -1,8 +1,9 @@
+// File: lib/supabase/server.ts
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function createClient() {
-  // Di Next.js versi terbaru, pemanggilan cookies() bersifat asynchronous
+  // Mengambil brankas cookie (penyimpanan sementara di browser pengguna)
   const cookieStore = await cookies()
 
   return createServerClient(
@@ -10,17 +11,24 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return cookieStore.getAll()
+        // Fungsi untuk membaca cookie (mengecek apakah user sudah login)
+        get(name: string) {
+          return cookieStore.get(name)?.value
         },
-        setAll(cookiesToSet) {
+        // Fungsi untuk menyimpan cookie baru (saat user berhasil login)
+        set(name: string, value: string, options: CookieOptions) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // Error ini bisa diabaikan karena biasanya dipicu jika kita memanggil
-            // fungsi ini dari Server Component. Middleware yang akan mengurus pembaruan cookie.
+            cookieStore.set({ name, value, ...options })
+          } catch (error) {
+            // Error ini wajar jika dipanggil dari Server Component biasa, kita abaikan saja
+          }
+        },
+        // Fungsi untuk menghapus cookie (saat user logout)
+        remove(name: string, options: CookieOptions) {
+          try {
+            cookieStore.set({ name, value: '', ...options })
+          } catch (error) {
+            // Sama seperti set, abaikan jika terjadi error di Server Component
           }
         },
       },

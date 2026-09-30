@@ -85,6 +85,32 @@ export default function AgendaPage() {
     setIsSubmitting(false);
   };
 
+  // ================= FUNGSI HAPUS AGENDA (BARU DITAMBAHKAN) =================
+  const handleHapusAgenda = async (idString: string, tipe: string) => {
+    if (!isAdmin) return; // Keamanan lapis pertama
+
+    if (tipe === "proker") {
+      alert("Program Kerja Utama hanya bisa dihapus melalui menu Program Kerja.");
+      return;
+    }
+
+    const konfirmasi = window.confirm("Apakah kamu yakin ingin menghapus agenda tambahan ini?");
+    if (!konfirmasi) return;
+
+    // Ekstrak ID asli angka dari Supabase
+    const idAsli = idString.replace("agenda-", "");
+    
+    const { error } = await supabase.from("agenda_kegiatan").delete().eq("id", idAsli);
+
+    if (!error) {
+      alert("Agenda berhasil dihapus!");
+      fetchSemuaAgenda(); // Refresh data otomatis setelah dihapus
+    } else {
+      alert("Gagal menghapus agenda: " + error.message);
+    }
+  };
+  // =========================================================================
+
   const formatTanggalCantik = (tanggalString: string) => {
     if (!tanggalString) return "Tanggal belum ditentukan";
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -92,12 +118,11 @@ export default function AgendaPage() {
   };
 
   return (
-    // PERUBAHAN 1: Hapus min-h-screen, ganti dengan tinggi yang mentok pas di 1 layar HP
     <div className="bg-slate-50 flex flex-col h-[calc(100vh-6rem)] sm:h-auto sm:min-h-screen p-2 sm:p-8">
       
       <div className="max-w-4xl mx-auto w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-10 relative flex flex-col h-full overflow-hidden sm:overflow-visible">
         
-        {/* AREA HEADER (Tetap Diam Saat Scroll) */}
+        {/* AREA HEADER */}
         <div className="shrink-0 mb-4 sm:mb-10 border-b border-slate-100 pb-4 sm:pb-6">
           <Link 
             href="/dashboard" 
@@ -127,9 +152,8 @@ export default function AgendaPage() {
           </div>
         </div>
 
-        {/* PERUBAHAN 2: AREA TIMELINE (Bisa Di-Scroll di HP) */}
+        {/* AREA TIMELINE */}
         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar -mx-4 sm:mx-0 px-4 sm:px-0 relative">
-          {/* Garis vertikal di tengah (hanya di Laptop) */}
           <div className="hidden sm:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-100 -translate-x-1/2"></div>
           
           {isLoading ? (
@@ -143,18 +167,28 @@ export default function AgendaPage() {
               {kalenderEvents.map((item, index) => (
                 <div key={item.id} className={`relative flex flex-col sm:flex-row items-center justify-between group ${index % 2 === 0 ? 'sm:flex-row-reverse' : ''}`}>
                   
-                  {/* Bulatan di tengah garis (Hanya di Laptop) */}
                   <div className={`hidden sm:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-4 border-white shadow-sm z-10 ${item.color}`}></div>
 
                   <div className="hidden sm:block w-5/12"></div>
 
-                  {/* Kartu Konten Timeline */}
                   <div className="w-full sm:w-5/12">
                     <div className="bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group-hover:border-slate-200">
-                      {/* Pita Warna di sisi kiri kartu */}
+                      
+                      {/* ================= TOMBOL HAPUS (BARU DITAMBAHKAN) ================= */}
+                      {isAdmin && item.type === "manual" && (
+                        <button
+                          onClick={() => handleHapusAgenda(item.id, item.type)}
+                          className="absolute top-3 right-3 sm:top-4 sm:right-4 text-slate-300 hover:text-rose-500 bg-white hover:bg-rose-50 p-1.5 rounded-lg transition-all z-20"
+                          title="Hapus Agenda"
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                        </button>
+                      )}
+                      {/* ==================================================================== */}
+
                       <div className={`absolute left-0 top-0 bottom-0 w-1.5 sm:w-1.5 ${item.color}`}></div>
                       
-                      <div className="ml-2 sm:ml-2">
+                      <div className="ml-2 sm:ml-2 pr-6"> {/* Ditambahkan pr-6 agar teks tidak menabrak tombol hapus */}
                         <span className={`inline-block px-2 py-1 rounded-md text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider mb-2 ${item.type === 'proker' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'}`}>
                           {item.badge}
                         </span>
